@@ -1,4 +1,109 @@
 # Guyver init script
 # Thanks to franciscofranco, ak, nathanchancellor and frap129
 
+on init
+   # zram
+   write /sys/block/zram0/max_comp_streams 6
+   write /sys/block/zram0/disksize 268435456
+   
+on post-fs
+   write /dev/cpuset/foreground/cpus 0-5
+   write /dev/cpuset/foreground/boost/cpus 0-5
+   write /dev/cpuset/background/cpus 0-2
+   write /dev/cpuset/system-background/cpus 0-2
+
+on boot
+   # enable sweep2wake up
+   chown root root /sys/android_touch/sweep2wake
+   chmod 666 /sys/android_touch/sweep2wake
+   write /sys/android_touch/sweep2wake 4
+   chmod 644 /sys/android_touch/sweep2wake
+
+on property:sys.boot_completed=1
+   # cpuset
+   write /dev/cpuset/foreground/cpus 0-2,4-5
+   write /dev/cpuset/foreground/boost/cpus 4-5
+   write /dev/cpuset/background/cpus 0-2
+   write /dev/cpuset/system-background/cpus 0-2
+
+   # Process Reclain
+   write /sys/module/process_reclaim/parameters/enable_process_reclaim 1
+   write /sys/module/process_reclaim/parameters/pressure_min 50
+   write /sys/module/process_reclaim/parameters/pressure_max 70
+   write /sys/module/process_reclaim/parameters/per_swap_size 512
+   write /sys/module/process_reclaim/parameters/swap_opt_eff 30
+
+   # Set I/O Scheduler tweaks
+   write /sys/block/mmcblk0/queue/scheduler maple
+   write /sys/block/mmcblk0/queue/read_ahead_kb 512
+   write /sys/block/mmcblk0/queue/iosched/writes_starved 4
+   write /sys/block/mmcblk0/queue/iosched/fifo_batch 16
+   write /sys/block/mmcblk0/queue/iosched/sync_read_expire 350
+   write /sys/block/mmcblk0/queue/iosched/sync_write_expire 550
+   write /sys/block/mmcblk0/queue/iosched/async_read_expire 250
+   write /sys/block/mmcblk0/queue/iosched/async_write_expire 450
+   write /sys/block/mmcblk0/queue/iosched/sleep_latency_multiple 10
+
+   # configure governor settings for little cluster
+   write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor blu_active
+   write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 400000
+   write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1478400
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/use_sched_load 1
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/align_windows 0   
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/use_migration_notif 1
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/above_hispeed_delay 20000
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/go_hispeed_load 99
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/timer_rate 20000
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/hispeed_freq 1382400
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/io_is_busy 0
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/target_loads "80 400000:33 691200:25 806400:50 1017600:65 1190400:70 1305600:85 1382400:90 1401600:92 1478400:98"
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/min_sample_time 40000
+   write /sys/devices/system/cpu/cpu0/cpufreq/blu_active/max_freq_hysteresis 80000
+
+   # configure governor settings for big cluster
+   write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor blu_active
+   write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 400000
+   write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 1843200
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/use_sched_load 1
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/align_windows 0   
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/use_migration_notif 1
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/above_hispeed_delay 20000
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/go_hispeed_load 99
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/timer_rate 20000
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/hispeed_freq 1305600
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/io_is_busy 0
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/target_loads "74 998400:73 1056000:64 1113600:80 1190400:61 1248000:69 1305600:64 1382400:74 1612800:69 1747200:67 1843200:72"
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/min_sample_time 40000
+   write /sys/devices/system/cpu/cpu4/cpufreq/blu_active/max_freq_hysteresis 80000
+
+   # set min/max frequencies for both clusters
+   # a53 min 400MHz
+   chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+   chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+   write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 400000
+   # a53 max 1478MHz
+   chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+   chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+   write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1478400
+   # a72 min 400MHz
+   chown system system /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+   chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+   write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 400000
+   # a72 max 1843MHz
+   chown system system /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq
+   chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq
+   write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 1843200
+
+   # adreno-boost
+   write /sys/class/kgsl/kgsl-3d0/devfreq/adrenoboost 1
+
+   # enable laptop mode
+   write /proc/sys/vm/laptop_mode 1
+
+   # Set UKSM configuration
+   write /sys/kernel/mm/uksm/max_cpu_percentage 20
+   write /sys/kernel/mm/uksm/run 0
+    
+   # Set Swappiness
+   write /proc/sys/vm/swappiness 8
 
