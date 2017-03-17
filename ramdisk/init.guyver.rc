@@ -37,7 +37,7 @@ on property:sys.boot_completed=1
    write /sys/block/mmcblk0/queue/scheduler maple
    write /sys/block/mmcblk0/queue/read_ahead_kb 512
    write /sys/block/mmcblk0/queue/iosched/writes_starved 4
-   write /sys/block/mmcblk0/queue/iosched/fifo_batch 16
+   write /sys/block/mmcblk0/queue/iosched/fifo_batch 8
    write /sys/block/mmcblk0/queue/iosched/sync_read_expire 350
    write /sys/block/mmcblk0/queue/iosched/sync_write_expire 550
    write /sys/block/mmcblk0/queue/iosched/async_read_expire 250
@@ -105,5 +105,32 @@ on property:sys.boot_completed=1
    write /sys/kernel/mm/uksm/run 0
     
    # Set Swappiness
-   write /proc/sys/vm/swappiness 8
+   write /proc/sys/vm/swappiness 20
+   
+   # Set color
+   write /sys/devices/platform/kcal_ctrl.0/kcal_sat 275
+   write /sys/devices/platform/kcal_ctrl.0/kcal_val 246
+   write /sys/devices/platform/kcal_ctrl.0/kcal_cont 270
+   write /sys/devices/platform/kcal_ctrl.0/kcal 256 256 256
+   
+   # Set Thermal
+   write /sys/module/msm_thermal/core_control/enabled 0
+   write /sys/module/msm_thermal/parameters/enabled Y
+   write /sys/module/msm_thermal/parameters/core_limit_temp_degC 85
+   write /sys/module/msm_thermal/parameters/temp_threshold 65
 
+   # Set VIBRATOR STRENGTH
+   write /sys/class/timed_output/vibrator/vtg_level 116
+   
+   # Set Misc
+   write /sys/kernel/sched/arch_power 1
+   
+   # Set INTELLI_Hotplug Settings
+   write /sys/kernel/intelli_plug/intelli_plug_active 1
+   write /sys/kernel/intelli_plug/full_mode_profile 0
+   write /sys/kernel/intelli_plug/hotplug_suspend 0
+   write /sys/kernel/intelli_plug/cpus_boosted 1
+   write /sys/kernel/intelli_plug/cpu_nr_run_threshold
+   write /sys/kernel/intelli_plug/min_cpus_online 3
+   write /sys/kernel/intelli_plug/max_cpus_online 5
+   write /sys/kernel/intelli_plug/nr_run_hysteresis 10
