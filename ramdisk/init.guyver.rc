@@ -5,6 +5,7 @@ on init
    # zram
    write /sys/block/zram0/max_comp_streams 6
    write /sys/block/zram0/disksize 268435456
+   write /sys/block/zram0/size 0
    
 on post-fs
    write /dev/cpuset/foreground/cpus 0-5
@@ -134,3 +135,19 @@ on property:sys.boot_completed=1
    write /sys/kernel/intelli_plug/min_cpus_online 3
    write /sys/kernel/intelli_plug/max_cpus_online 5
    write /sys/kernel/intelli_plug/nr_run_hysteresis 10
+   
+   # Backlight dimmer
+   write /sys/module/mdss_fb/parameters/backlight_dimmer 1
+   
+   # Adaptive LMK
+   write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
+   
+   # wakeups bypass
+   write /sys/module/wakeup/parameters/enable_bluedroid_timer_ws 0
+   write /sys/module/wakeup/parameters/enable_ipa_ws 0
+   write /sys/module/wakeup/parameters/enable_msm_hsic_ws 0
+   write /sys/module/wakeup/parameters/enable_si_ws 0
+   write /sys/module/wakeup/parameters/wlan_ctrl_wake 0
+   write /sys/module/wakeup/parameters/wlan_rx_wake 0
+   write /sys/module/wakeup/parameters/wlan_wake 0
+   
