@@ -37,11 +37,13 @@ dump_boot;
 # add guyver initialization script
 insert_line init.rc "import /init.guyver.rc" after "import /init.cm.rc" "import /init.guyver.rc";
 
-# fstab default to noatime
-patch_fstab fstab.qcom /data f2fs options "nosuid,nodev,noatime,nodiratime,inline_xattr,data_flush                        wait,check,encryptable=footer,formattable,length=-16384" "nosuid,nodev,noatime,inline_xattr,data_flush                        wait,check,encryptable=footer,formattable,length=-16384"
-patch_fstab fstab.qcom /data ext4 options "nosuid,nodev,noatime,nodiratime,barrier=1,noauto_da_alloc                      wait,check,encryptable=footer,formattable,length=-16384" "nosuid,nodev,noatime,barrier=1,noauto_da_alloc                      wait,check,encryptable=footer,formattable,length=-16384"
-patch_fstab fstab.qcom /cache f2fs options "nosuid,nodev,noatime,nodiratime,inline_xattr,flush_merge,data_flush            wait,check,formattable" "nosuid,nodev,noatime,inline_xattr,flush_merge,data_flush            wait,check,formattable"
-patch_fstab fstab.qcom /cache ext4 options "nosuid,nodev,noatime,nodiratime,barrier=1                                      wait,check,formattable" "nosuid,nodev,noatime,barrier=1                                      wait,check,formattable"
+#fstab lazytime support
+patch_fstab fstab.qcom /system ext4 options "ro,barrier=1,discard wait" "ro,lazytime,barrier=1,discard wait"
+patch_fstab fstab.qcom /data f2fs options "nosuid,nodev,noatime,inline_xattr,data_flush wait,check,encryptable=footer,formattable,length=-16384" "nosuid,nodev,lazytime,inline_xattr,data_flush wait,check,encryptable=footer,formattable,length=-16384"
+patch_fstab fstab.qcom /data ext4 options "nosuid,nodev,noatime,barrier=1,noauto_da_alloc wait,check,encryptable=footer,formattable,length=-16384" "nosuid,nodev,lazytime,barrier=1,noauto_da_alloc wait,check,encryptable=footer,formattable,length=-16384"
+patch_fstab fstab.qcom /cache f2fs options "nosuid,nodev,noatime,inline_xattr,flush_merge,data_flush wait,check,formattable" "nosuid,nodev,lazytime,inline_xattr,flush_merge,data_flush wait,check,formattable"
+patch_fstab fstab.qcom /cache ext4 options "nosuid,nodev,noatime,barrier=1 wait,check,formattable" "nosuid,nodev,lazytime,barrier=1 wait,check,formattable"
+patch_fstab fstab.qcom /persist ext4 options "nosuid,nodev,barrier=1 wait" "lazytime,nosuid,nodev,barrier=1 wait"
 
 mount -o rw,remount -t auto /system;
 rm -f /system/lib/modules/wlan.ko;
