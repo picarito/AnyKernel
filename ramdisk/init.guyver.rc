@@ -133,7 +133,7 @@ on property:sys.boot_completed=1
    write /sys/kernel/intelli_plug/cpus_boosted 1
    write /sys/kernel/intelli_plug/cpu_nr_run_threshold
    write /sys/kernel/intelli_plug/min_cpus_online 3
-   write /sys/kernel/intelli_plug/max_cpus_online 5
+   write /sys/kernel/intelli_plug/max_cpus_online 6
    write /sys/kernel/intelli_plug/nr_run_hysteresis 10
    
    # Backlight dimmer
@@ -150,4 +150,7 @@ on property:sys.boot_completed=1
    write /sys/module/wakeup/parameters/wlan_ctrl_wake 0
    write /sys/module/wakeup/parameters/wlan_rx_wake 0
    write /sys/module/wakeup/parameters/wlan_wake 0
-   
+   write /sys/module/wakeup/parameters/enable_wlan_wow_wl_ws 0
+   write /sys/module/wakeup/parameters/enable_timerfd_ws 0
+   write /sys/module/wakeup/parameters/enable_netlink_ws 0
+
